@@ -26,7 +26,6 @@ public class ContaCorrenteControllerTests
     [Fact]
     public async Task Movimentar_ShouldReturnBadRequest_WhenValidationExceptionIsThrown()
     {
-        // Arrange
         var command = new MovimentarContaCorrenteCommand
         {
             Id = "invalid-id",
@@ -36,10 +35,8 @@ public class ContaCorrenteControllerTests
 
         _mediator.Send(command).Returns(Task.FromException<string>(new ValidationException(ValidationErrorType.InvalidAccount)));
 
-        // Act
         var result = await _controller.Movimentar(command);
 
-        // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
         Assert.Equal("InvalidAccount", ((dynamic)badRequestResult.Value).Mensagem);
     }
@@ -47,8 +44,6 @@ public class ContaCorrenteControllerTests
     [Fact]
     public async Task ConsultarSaldo_ShouldReturnOk_WhenContaCorrenteIsValid()
     {
-        // Arrange
-        var query = new ConsultarSaldoQuery { IdContaCorrente = "valid-id" };
         var saldoDto = new SaldoDto
         {
             Numero = 123,
@@ -57,12 +52,10 @@ public class ContaCorrenteControllerTests
             Saldo = 100
         };
 
-        _mediator.Send(query).Returns(Task.FromResult(saldoDto));
+        _mediator.Send(Arg.Any<ConsultarSaldoQuery>()).Returns(Task.FromResult(saldoDto));
 
-        // Act
         var result = await _controller.ConsultarSaldo("valid-id");
 
-        // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
         Assert.NotNull(okResult.Value);
         var returnedSaldo = Assert.IsType<SaldoDto>(okResult.Value);
